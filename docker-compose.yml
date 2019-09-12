@@ -1,0 +1,33 @@
+version: '3'
+services:
+  phoenix:
+    # tell docker-compose which Dockerfile it needs to build
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MIX_ENV=dev
+      - DATABASE_URL=ecto://postgres:postgres.0.0.0:5432/bank_platform_dev
+      - SECRET_KEY_BASE=acb123
+    # map the port of phoenix to the local dev port
+    ports:
+      - "4000:4000"
+      - "4001:4001"
+    # mount the code folder inside the running container for easy development
+    volumes:
+      - .:/app/acme_bank
+    # make sure we start postgres when we start this service
+    links:
+      - postgres
+  postgres:
+    # use postgres:9.5
+    image: postgres:9.5
+    # map the data volume, this is the way to keep our data persisitent
+    volumes:
+       - db_data:/var/lib/postgresql/data
+    # set the user and password for postgres
+    ports: 
+      - "5432"
+# create a named datavolume
+volumes:
+    db_data:
